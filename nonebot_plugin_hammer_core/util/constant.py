@@ -23,7 +23,7 @@ class ConstError(RuntimeError):
 class __ConstantNamespace:
     def __getattr__(self, item):
         if item not in self.__dict__:
-            self.__dict__[item] = Const
+            self.__dict__[item] = Const()
         return self.__dict__[item]
 
 

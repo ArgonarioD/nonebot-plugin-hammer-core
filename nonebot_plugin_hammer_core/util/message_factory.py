@@ -13,6 +13,6 @@ def reply_text(text: str, event: MessageEvent, message_id: int = None) -> Messag
     ])
 
 
-def reply(event: MessageEvent, data) -> Message:
+def reply(data, event: MessageEvent) -> Message:
     datalist = [MessageSegment(type='reply', data={'id': event.message_id})]
     return Message(datalist + data)
