@@ -1,5 +1,3 @@
-import traceback
-
 from nonebot.adapters.onebot.v11 import Bot, ActionFailed
 
 
@@ -9,7 +7,8 @@ async def get_qq_nickname_with_group(
         current_group_id: int,
         target_group_id: int = None,
         pattern: str = '{nickname}{qq_id}{target_group}',
-        target_group_pattern: str = '(来自群“{target_group_name}”)'
+        qq_id_pattern: str = '({id})',
+        target_group_pattern: str = '@{target_group_name}'
 ) -> str:
     if target_group_id is None:
         target_group_id = current_group_id
@@ -21,24 +20,24 @@ async def get_qq_nickname_with_group(
             nickname = info['nickname']
         else:
             nickname = info['card'].strip()
-        return pattern.replace('{target_group}', '').replace('{nickname}', nickname).replace('{qq_id}', f'({user_id})')
-    except ActionFailed as exc:
-        if exc.info['retcode'] == 100:
-            # if not the same group
-            info = await bot.get_stranger_info(user_id=user_id)
-            return await __stranger_convert(bot, info['nickname'], target_group_id, pattern, target_group_pattern)
-        else:
-            traceback.print_exc()
+        return (pattern.replace('{target_group}', '')
+                .replace('{nickname}', nickname)
+                .replace('{qq_id}', qq_id_pattern.replace('{id}', str(user_id))))
+    except ActionFailed:
+        # if not the same group
+        nickname = '未知用户'
+        group_name = '未知群组'
+        try:
+            stranger_info = await bot.get_stranger_info(user_id=user_id)
+            nickname = stranger_info['nickname']
+        except ActionFailed:
+            pass
+        try:
+            group_info = await bot.get_group_info(group_id=target_group_id)
+            group_name = group_info['group_name']
+        except ActionFailed:
+            pass
 
-
-async def __stranger_convert(
-        bot: Bot,
-        nickname: str,
-        target_group_id: int,
-        pattern: str,
-        target_group_pattern: str
-) -> str:
-    group_info = await bot.get_group_info(group_id=target_group_id)
-    return pattern.replace('{nickname}', nickname) \
-        .replace('{qq_id}', '') \
-        .replace('{target_group}', target_group_pattern.replace('{target_group_name}', group_info['group_name']))
+        return pattern.replace('{nickname}', nickname) \
+            .replace('{qq_id}', '') \
+            .replace('{target_group}', target_group_pattern.replace('{target_group_name}', group_name))

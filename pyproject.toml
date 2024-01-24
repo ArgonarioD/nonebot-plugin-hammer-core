@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-hammer-core"
-version = "0.3.2"
+version = "0.3.3"
 description = "core dependency of nonebot-plugin-hammer-xxx"
 authors = ["ArgonarioD <739062975@qq.com>"]
 license = "Apache-2.0"
@@ -15,11 +15,11 @@ classifiers = [
 [[tool.poetry.source]]
 name = "tsinghua"
 url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple/"
-default = true
+priority = "primary"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-nonebot-adapter-onebot = "^2.2.3"
+nonebot-adapter-onebot = "^2.3.0"
 
 [tool.poetry.dev-dependencies]
 
